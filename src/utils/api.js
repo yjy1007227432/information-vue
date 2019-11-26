@@ -69,21 +69,3 @@ export const getRequest = (url,params) => {
     url: `${base}${url}`
   });
 }
-export function uploadPdf (formData, callback1, callback2) {
-  return axios({
-    headers: {"Content-Type": "multipart/form-data"},
-    url: '/information/uploadimg',
-    method: 'post',
-    data: formData,
-    transformRequest: [function (data) {
-      return data
-    }],
-    onUploadProgress (progressEvent) {
-      if (progressEvent.lengthComputable) {
-        callback1(progressEvent)
-      }
-    }
-  }).then(res => {
-    callback2(res)
-  })
-}

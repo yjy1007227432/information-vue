@@ -1,7 +1,7 @@
 <template>
   <el-container v-loading="loading" class="post-article">
     <el-header class="header">
-      <el-select v-model="article.cid" placeholder="请选择竞争信息栏目" style="width: 150px;">
+      <el-select v-model="article.cid" placeholder="请选择文章栏目" style="width: 150px;">
         <el-option
           v-for="item in categories"
           :key="item.id"

@@ -1,7 +1,7 @@
 <template>
   <el-container class="home_container">
     <el-header>
-      <div class="home_title">信息收集系统</div>
+      <div class="home_title">竞争信息收集系统</div>
       <div class="home_userinfoContainer">
         <el-dropdown @command="handleCommand">
   <span class="el-dropdown-link home_userinfo">
@@ -9,8 +9,8 @@
   </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="sysMsg">系统消息</el-dropdown-item>
-            <!-- <el-dropdown-item command="MyInformation">我的信息</el-dropdown-item>
-            <el-dropdown-item command="MyHome">个人主页</el-dropdown-item> -->
+            <el-dropdown-item command="MyArticle">我的信息</el-dropdown-item>
+            <el-dropdown-item command="MyHome">个人主页</el-dropdown-item>
             <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -46,93 +46,10 @@
             <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item v-text="this.$router.currentRoute.name"></el-breadcrumb-item>
           </el-breadcrumb>
-          <div style="text-align: right;">
-            <el-form :inline="true" :model="formInline" class="demo-form-inline">
-              <el-form-item label="">
-                <el-select v-model="formInline.value" placeholder="请选择">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="">
-                <el-input v-model="formInline.keywords" placeholder="请输入内容"></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="onSubmit">查询</el-button>
-              </el-form-item>
-            </el-form>
-          </div>
-          <div>
-            <el-table
-              :data="articles"
-              tooltip-effect="dark"
-              style="width: 100%;overflow-x: hidden; overflow-y: hidden;"
-              max-height="390"
-              v-loading="loading">
-              <el-table-column
-                label="标题"
-                align="left">
-                <template slot-scope="scope"><span>{{ formInline.value=='information' ?scope.row.title:scope.row.strTitle}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column
-                label="总结"
-                width=200px;
-                align="left">
-                <template slot-scope="scope"><span style="color: #409eff;cursor: pointer" @click="itemClick(scope.row)">{{ scope.row.summary}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column
-                label="产品"
-                align="left">
-                <template slot-scope="scope"><span>{{ scope.row.product}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column
-                v-if="formInline.value=='strategy'"
-                label="策略效果"
-                align="left">
-                <template slot-scope="scope"><span>{{ scope.row.income}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column
-                v-if="formInline.value=='information'"
-                label="来源"
-                align="left">
-                <template slot-scope="scope"><span>{{ scope.row.source}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column
-                label="重要性"
-                align="left">
-                <template slot-scope="scope"><span>{{ scope.row.alarm}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column
-                label="上传者" width="50px" align="left">
-                <template slot-scope="scope">{{ scope.row.nickname}}</template>
-              </el-table-column>
-              <el-table-column
-                label="上传时间" width="80px" align="left">
-                <template slot-scope="scope">{{ scope.row.editTime | formatDateTime}}</template>
-              </el-table-column>
-              <el-table-column
-                prop="cateName"
-                label="所属分类"
-                width="120" align="left">
-              </el-table-column>
-            </el-table>
-            <el-pagination
-              background
-              :page-size="pageSize"
-              layout="prev, pager, next"
-              :total="totalCount" @current-change="currentChange" v-if="articles&&articles.length>0">
-            </el-pagination>
-          </div>
+          <keep-alive>
+            <router-view v-if="this.$route.meta.keepAlive"></router-view>
+          </keep-alive>
+          <router-view v-if="!this.$route.meta.keepAlive"></router-view>
         </el-main>
       </el-container>
     </el-container>
@@ -142,40 +59,6 @@
   import {getRequest} from '../utils/api'
   export default{
     methods: {
-      //翻页
-      currentChange(currentPage){
-        this.currentPage = currentPage;
-        this.loading = true;
-        this.loadBlogs(currentPage, this.pageSize);
-      },
-      loadBlogs(page, count){
-        var _this = this;
-        var url = `${_this.formInline.value}/all?state=-1&page=${page}&count=${count}&keywords=${_this.formInline.keywords}`;
-        
-        getRequest(url).then(resp=> {
-          _this.loading = false;
-          if (resp.status == 200) {
-            _this.articles = _this.formInline.value=='information' ? resp.data.informations : resp.data.strategy;
-            _this.totalCount = resp.data.totalCount;
-          } else {
-            _this.$message({type: 'error', message: '数据加载失败!'});
-          }
-        }, resp=> {
-          _this.loading = false;
-          if (resp.response.status == 403) {
-            _this.$message({type: 'error', message: resp.response.data});
-          } else {
-            _this.$message({type: 'error', message: '数据加载失败!'});
-          }
-        }).catch(resp=> {
-          //压根没见到服务器
-          _this.loading = false;
-          _this.$message({type: 'error', message: '数据加载失败!'});
-        })
-      },
-      onSubmit() {
-        this.loadBlogs(1, 6);
-      },
       handleCommand(command){
         var _this = this;
         if (command == 'logout') {
@@ -194,35 +77,21 @@
       }
     },
     mounted: function () {
-      
+      this.$alert('欢迎在本系统添加信息!', '杭州电信', {
+        confirmButtonText: '确定',
+        callback: action => {
+        }
+      });
       var _this = this;
       getRequest("/currentUserName").then(function (msg) {
         _this.currentUserName = msg.data;
       }, function (msg) {
         _this.currentUserName = '游客';
       });
-      this.loading = true;
-      this.loadBlogs(1, 6);
     },
     data(){
       return {
-        currentUserName: '',
-        options: [{
-          value: 'information',
-          label: '竞争信息'
-        }, {
-          value: 'strategy',
-          label: '策略'
-        }],
-        formInline: {
-          value: 'information',
-          keywords: ''
-        },
-        articles: [],
-        loading: false,
-        totalCount: 0,
-        pageSize: 6,
-        currentPage: 1
+        currentUserName: ''
       }
     }
   }

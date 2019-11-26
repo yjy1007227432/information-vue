@@ -40,7 +40,7 @@
       this.activeName = this.$route.query.an
       var _this = this;
       this.loading = true;
-      getRequest("/inforamtion/" + aid).then(resp=> {
+      getRequest("/article/" + aid).then(resp=> {
         if (resp.status == 200) {
           _this.article = resp.data;
         }

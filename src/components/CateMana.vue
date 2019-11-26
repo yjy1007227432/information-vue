@@ -3,7 +3,7 @@
     <el-header class="cate_mana_header">
       <el-input
         placeholder="请输入栏目名称"
-        v-model="cateName" style="width: ;">
+        v-model="cateName" style="width: 200px;">
       </el-input>
       <el-button type="primary" size="medium" style="margin-left: 10px" @click="addNewCate">新增栏目</el-button>
     </el-header>

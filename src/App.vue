@@ -19,8 +19,4 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-.link{
-    list-style: decimal-leading-zero;
-    text-align: left;
-  }
 </style>
